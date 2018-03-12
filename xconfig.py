@@ -3,6 +3,7 @@ import time
 import datetime
 import logging
 import types
+import collections.abc as abc
 from enum import Enum
 from watchdog.observers import Observer as WatchdogObserver
 from watchdog.events import FileSystemEventHandler
@@ -17,28 +18,84 @@ class FileType(Enum):
     Json = 'JSON'
 
 
-class Entry(object):
-    def __init__(self, tag, default=None, required=False, force_write=False, help=None, store_as=None):
+class _Entry:
+    def __init__(self, tag):
         self._tag = tag
+
+    @property
+    def tag(self):
+        return self._tag
+
+
+class Boolean:
+    pass
+
+
+class String:
+    pass
+
+
+class Number:
+    pass
+
+
+class Option(_Entry):
+    def __init__(self, tag, value_type, default=None, required=False, force_write=False, help=None):
+        super().__init__(tag)
+        self._value_type = value_type
         self._default = default
         self._required = required
         self._force_write = force_write
         self._help = help
-        self._store_as = store_as
+
+    @property
+    def value_type(self):
+        return self._value_type
+
+    @property
+    def default_value(self):
+        return self._default
+
+    @property
+    def is_required(self):
+        return self._required
+
+    @property
+    def force_write(self):
+        return self._force_write
+
+    @property
+    def help(self):
+        return self._help
 
 
-class _RootSection(object):
-    def __init__(self):
+class _RootSection(_Entry, abc.MutableSequence):
+    def __init__(self, tag=None):
+        _Entry.__init__(self, tag)
+        abc.MutableSequence.__init__(self)
         self._entries = []
 
-    def append(self, entry):
-        assert entry is not None
-        self._entries.append(entry)
+    def __setitem__(self, index, value):
+        self._entries[index] = value
+
+    def __getitem__(self, index):
+        return self._entries[index]
+
+    def __len__(self):
+        return len(self._entries)
+
+    def __delitem__(self, index):
+        del self._entries[index]
+
+    def insert(self, index, value):
+        self._entries.insert(index, value)
 
 
 class Section(_RootSection):
-    def __init__(self, name):
-        self._name = name
+    def __init__(self, tag):
+        if tag is None:
+            raise ValueError("tag must be valid and non None")
+        super(tag)
 
 
 class _Monitor(FileSystemEventHandler):
