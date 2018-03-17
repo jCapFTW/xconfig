@@ -9,13 +9,19 @@ class IniTest(unittest.TestCase):
 
     def test_option_properties(self):
         option = xconfig.Option('Root_Option1', value_type=xconfig.Boolean, default=False, required=False,
-                                force_write=False, help="TEST")
-        assert(option.tag == 'Root_Option1')
-        assert(option.value_type == xconfig.Boolean)
-        assert(not option.default_value)
-        assert(not option.is_required)
-        assert(not option.force_write)
-        assert(option.help == "TEST")
+                                hidden=False, help="TEST ME")
+        self.assertEqual(option.tag, 'Root_Option1')
+        self.assertEqual(option.value_type, xconfig.Boolean)
+        self.assertEqual(option.default_value, False)
+        self.assertEqual(option.required, False)
+        self.assertEqual(option.hidden, False)
+        self.assertEqual(option.help, "TEST ME")
+
+    def test_option_properties_failure(self):
+        with self.assertRaises(ValueError):
+            xconfig.Option(None, xconfig.Boolean)
+        with self.assertRaises(ValueError):
+            xconfig.Option('Text', None)
 
 
 if __name__ == '__main__':

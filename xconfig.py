@@ -27,25 +27,33 @@ class _Entry:
         return self._tag
 
 
-class Boolean:
+class ValueType:
     pass
 
 
-class String:
+class Boolean(ValueType):
     pass
 
 
-class Number:
+class String(ValueType):
+    pass
+
+
+class Number(ValueType):
     pass
 
 
 class Option(_Entry):
-    def __init__(self, tag, value_type, default=None, required=False, force_write=False, help=None):
+    def __init__(self, tag, value_type, default=None, required=False, hidden=False, help=None):
+        if not tag:
+            raise ValueError("tag must be valid and not None")
         super().__init__(tag)
+        if not value_type:
+            raise ValueError("value_type must be valid and not None")
         self._value_type = value_type
         self._default = default
         self._required = required
-        self._force_write = force_write
+        self._hidden = hidden
         self._help = help
 
     @property
@@ -57,22 +65,31 @@ class Option(_Entry):
         return self._default
 
     @property
-    def is_required(self):
+    def required(self):
         return self._required
 
     @property
-    def force_write(self):
-        return self._force_write
+    def hidden(self):
+        return self._hidden
+
+    @hidden.getter
+    def hidden(self, value):
+        self._hidden = value
 
     @property
     def help(self):
         return self._help
 
+    @help.getter
+    def help(self, value):
+        self._help = value
+
 
 class _RootSection(_Entry, abc.MutableSequence):
-    def __init__(self, tag=None):
+    def __init__(self, tag=None, is_root=True):
         _Entry.__init__(self, tag)
         abc.MutableSequence.__init__(self)
+        self._is_root = is_root
         self._entries = []
 
     def __setitem__(self, index, value):
@@ -90,11 +107,15 @@ class _RootSection(_Entry, abc.MutableSequence):
     def insert(self, index, value):
         self._entries.insert(index, value)
 
+    @property
+    def is_root(self):
+        return self.is_root
+
 
 class Section(_RootSection):
     def __init__(self, tag):
-        if tag is None:
-            raise ValueError("tag must be valid and non None")
+        if not tag:
+            raise ValueError("tag must be valid and not None")
         super(tag)
 
 
