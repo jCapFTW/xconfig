@@ -4,6 +4,7 @@ import datetime
 import logging
 import types
 import collections.abc as abc
+import configparser
 from enum import Enum
 from watchdog.observers import Observer as WatchdogObserver
 from watchdog.events import FileSystemEventHandler
@@ -13,9 +14,28 @@ if _logger.level == logging.NOTSET:
     _logger.setLevel(logging.WARN)
 
 
-class FileType(Enum):
-    INI = 'INI'
-    Json = 'JSON'
+class INI:
+    @staticmethod
+    def read(filename):
+        cfg = configparser.ConfigParser()
+        cfg.read(filename)
+        blob = {}
+        for section in cfg.sections():
+            blob[section] = {}
+            for key in cfg[section]:
+                blob[section][key] = cfg[section][key]
+        return blob
+
+    @staticmethod
+    def write(blob, filename):
+        cfg = configparser.ConfigParser()
+        cfg.read_dict(blob)
+        with open(filename, 'w') as configfile:
+            cfg.write(configfile)
+
+    @staticmethod
+    def supports_layers():
+        return False
 
 
 class _Entry:
@@ -25,6 +45,10 @@ class _Entry:
     @property
     def tag(self):
         return self._tag
+
+    @tag.setter
+    def tag(self, value):
+        self._tag = value
 
 
 class ValueType:
@@ -60,19 +84,31 @@ class Option(_Entry):
     def value_type(self):
         return self._value_type
 
+    @value_type.setter
+    def value_type(self, value):
+        self._value_type = value
+
     @property
     def default_value(self):
         return self._default
+
+    @default_value.setter
+    def default_value(self, value):
+        self._default = value
 
     @property
     def required(self):
         return self._required
 
+    @required.setter
+    def required(self, value):
+        self._required = value
+
     @property
     def hidden(self):
         return self._hidden
 
-    @hidden.getter
+    @hidden.setter
     def hidden(self, value):
         self._hidden = value
 
@@ -80,7 +116,7 @@ class Option(_Entry):
     def help(self):
         return self._help
 
-    @help.getter
+    @help.setter
     def help(self, value):
         self._help = value
 
@@ -116,7 +152,7 @@ class Section(_RootSection):
     def __init__(self, tag):
         if not tag:
             raise ValueError("tag must be valid and not None")
-        super(tag)
+        super().__init__(tag)
 
 
 class _Monitor(FileSystemEventHandler):
@@ -155,7 +191,7 @@ class Definition(_RootSection):
     def __init__(self):
         super(Definition, self).__init__()
 
-    def load(self, file_name=None, file_type=FileType.INI, monitor_file=False):
+    def load(self, file_name=None, file_type=INI, monitor_file=False):
         config = "Test"
         if monitor_file:
             self._monitors.append(_Monitor(self, file_type, config, file_name))

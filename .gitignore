@@ -3,3 +3,8 @@ __pycache__/
 venv/
 
 xconfig.iml
+
+*out.ini
+*out.json
+*out.cfg
+*out.config
