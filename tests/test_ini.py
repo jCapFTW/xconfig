@@ -10,10 +10,10 @@ class IniTest(unittest.TestCase):
                      'FloatTest': {'v1': '3465.325', 'v2': '-0.2003'}}
 
     def test_load(self):
-        self.assertEqual(xconfig.INI.read("test_in.ini"), self.blob)
+        self.assertEqual(xconfig.INI.read("tests/test_in.ini"), self.blob)
 
     def test_save(self):
-        xconfig.INI.write(self.blob, "text_out.ini")
+        xconfig.INI.write(self.blob, "text_out.ini" )
 
 
 if __name__ == '__main__':
