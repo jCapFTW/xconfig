@@ -25,7 +25,7 @@ class Source:
 
     def attach_change_listener(self, listener: Callable):
         self._listeners.append(listener)
-    
+
     def detach_change_listener(self, listener: Callable):
         try:
             self._listeners.remove(listener)
