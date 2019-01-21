@@ -14,7 +14,7 @@ class INI(Source):
         self._filename = filename
         self._read_only = read_only
         self._monitor = FileMonitor(filename, self._notify_listeners) if monitor else None
-    
+
     def read(self):
         cfg = configparser.ConfigParser()
         cfg.read(self._filename)

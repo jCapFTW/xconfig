@@ -1,6 +1,6 @@
 import logging
 from enum import Enum
-from typing import Callable, Any
+from typing import Callable
 
 _logger = logging.getLogger('xconfig')
 if _logger.level == logging.NOTSET:

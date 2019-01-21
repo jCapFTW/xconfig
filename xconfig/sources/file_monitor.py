@@ -1,6 +1,6 @@
 from watchdog.observers import Observer as WatchdogObserver
 from watchdog.events import FileSystemEventHandler
-from typing import Callable, Any
+from typing import Callable
 import os
 import datetime
 import logging
@@ -34,5 +34,3 @@ class FileMonitor(FileSystemEventHandler):
         within_threshold = span < datetime.timedelta(milliseconds=50)
         self._last_event_time = current_time
         return within_threshold
-
-
