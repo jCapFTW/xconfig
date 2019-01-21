@@ -39,7 +39,3 @@ class DefinitionTest(unittest.TestCase):
             xconfig.Option(None, xconfig.Boolean)
         with self.assertRaises(ValueError):
             xconfig.Option('Text', None)
-
-
-if __name__ == '__main__':
-    unittest.main()

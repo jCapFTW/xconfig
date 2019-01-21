@@ -1,11 +1,7 @@
 import collections.abc as abc
-import datetime
 import logging
-import os
-import time
-from enum import Enum
-from typing import Any, Callable
 import types
+from .sources.source import Source
 
 _logger = logging.getLogger('xconfig')
 if _logger.level == logging.NOTSET:
@@ -139,12 +135,12 @@ class Config(types.SimpleNamespace):
         self._definition = definition
         self._source = None
 
-    @staticmethod
-    def loads(self, definition: Definition, source: Source) -> Config:
+    @classmethod
+    def loads(cls, definition: Definition, source: Source) -> 'Config':
         config = Config(definition)
         config.load(source)
         return config
-    
+
     def load(self, source: Source):
         if self._source:
             self._source.detach_change_listener(self._on_source_changed)
@@ -153,7 +149,7 @@ class Config(types.SimpleNamespace):
         self._config = Config(self)
         _load_config(self, self._definition)
         return self._config
-    
+
     def save(self):
         self._save_config(self, self._definition)
 
@@ -163,6 +159,7 @@ class Config(types.SimpleNamespace):
 
 def _load_config(config: Config, definition: Definition):
     pass
+
 
 def _save_definition(config: Config, Definition: Definition):
     pass
